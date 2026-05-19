@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Arduino & Raspberry Pi Experiments</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+      background:#000;
+      color:#fff;
+      padding:40px;
+      line-height:1.6;
+    }
+
+    h1{
+      font-size:42px;
+      margin-bottom:10px;
+      font-weight:700;
+    }
+
+    .subtitle{
+      color:#aaa;
+      margin-bottom:40px;
+    }
+
+    .section{
+      border:1px solid #fff;
+      padding:25px;
+      margin-bottom:30px;
+    }
+
+    .section h2{
+      font-size:28px;
+      margin-bottom:20px;
+      border-bottom:1px solid #fff;
+      padding-bottom:10px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+      margin-top:20px;
+    }
+
+    .box{
+      border:1px solid #fff;
+      padding:20px;
+    }
+
+    .box h3{
+      margin-bottom:15px;
+      font-size:20px;
+    }
+
+    ul{
+      padding-left:20px;
+    }
+
+    li{
+      margin-bottom:10px;
+    }
+
+    pre{
+      background:#000;
+      border:1px solid #fff;
+      padding:15px;
+      overflow-x:auto;
+      white-space:pre-wrap;
+      word-wrap:break-word;
+      margin-top:10px;
+    }
+
+    code{
+      color:#fff;
+      font-size:14px;
+    }
+
+    .install{
+      margin-top:15px;
+    }
+
+    @media(max-width:900px){
+
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      body{
+        padding:20px;
+      }
+
+      h1{
+        font-size:32px;
+      }
+
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>Arduino UNO & Raspberry Pi Experiments</h1>
+  <p class="subtitle">
+    Minimal IoT Experiments Documentation
+  </p>
+
+  <!-- Experiment 1 -->
+  <div class="section">
+
+    <h2>1. Turn ON LED When Button is Pressed</h2>
+
+    <div class="grid">
+
+      <div class="box">
+        <h3>Arduino UNO</h3>
+
+        <ul>
+          <li>LED + → Pin 13</li>
+          <li>Button → Pin 2</li>
+          <li>GND → GND</li>
+        </ul>
+
+<pre><code>
+int buttonPin = 2;
+int ledPin = 13;
+
+void setup() {
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+
+  if(digitalRead(buttonPin) == LOW) {
+    digitalWrite(ledPin, HIGH);
+  }
+  else {
+    digitalWrite(ledPin, LOW);
+  }
+
+}
+</code></pre>
+
+      </div>
+
+      <div class="box">
+        <h3>Raspberry Pi</h3>
+
+        <ul>
+          <li>LED → GPIO17</li>
+          <li>Button → GPIO27</li>
+          <li>GND → GND</li>
+        </ul>
+
+        <div class="install">
+          <strong>Install:</strong>
+
+<pre><code>
+sudo apt install python3-rpi.gpio
+</code></pre>
+        </div>
+
+<pre><code>
+import RPi.GPIO as GPIO
+import time
+
+LED = 17
+BUTTON = 27
+
+GPIO.setmode(GPIO.BCM)
+
+GPIO.setup(LED, GPIO.OUT)
+GPIO.setup(BUTTON, GPIO.IN,
+pull_up_down=GPIO.PUD_UP)
+
+while True:
+
+    if GPIO.input(BUTTON) == 0:
+        GPIO.output(LED, 1)
+    else:
+        GPIO.output(LED, 0)
+
+    time.sleep(0.1)
+</code></pre>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Experiment 2 -->
+  <div class="section">
+
+    <h2>2. IR Sensor Detection with LED & Buzzer</h2>
+
+    <div class="grid">
+
+      <div class="box">
+
+        <h3>Arduino UNO</h3>
+
+        <ul>
+          <li>IR OUT → Pin 2</li>
+          <li>LED → Pin 8</li>
+          <li>Buzzer → Pin 9</li>
+        </ul>
+
+<pre><code>
+int irSensor = 2;
+int led = 8;
+int buzzer = 9;
+
+void setup() {
+
+  pinMode(irSensor, INPUT);
+  pinMode(led, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+
+}
+
+void loop() {
+
+  if(digitalRead(irSensor) == LOW) {
+
+    digitalWrite(led, HIGH);
+    digitalWrite(buzzer, HIGH);
+
+  } else {
+
+    digitalWrite(led, LOW);
+    digitalWrite(buzzer, LOW);
+
+  }
+
+}
+</code></pre>
+
+      </div>
+
+      <div class="box">
+
+        <h3>Raspberry Pi</h3>
+
+        <ul>
+          <li>IR → GPIO18</li>
+          <li>LED → GPIO23</li>
+          <li>Buzzer → GPIO24</li>
+        </ul>
+
+<pre><code>
+sudo apt install python3-rpi.gpio
+</code></pre>
+
+<pre><code>
+import RPi.GPIO as GPIO
+import time
+
+IR = 18
+LED = 23
+BUZZER = 24
+
+GPIO.setmode(GPIO.BCM)
+
+GPIO.setup(IR, GPIO.IN)
+GPIO.setup(LED, GPIO.OUT)
+GPIO.setup(BUZZER, GPIO.OUT)
+
+while True:
+
+    if GPIO.input(IR) == 0:
+
+        GPIO.output(LED, 1)
+        GPIO.output(BUZZER, 1)
+
+    else:
+
+        GPIO.output(LED, 0)
+        GPIO.output(BUZZER, 0)
+
+    time.sleep(0.1)
+</code></pre>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Experiment 3 -->
+  <div class="section">
+
+    <h2>3. LDR Controlled LED</h2>
+
+    <div class="grid">
+
+      <div class="box">
+
+        <h3>Arduino UNO</h3>
+
+        <ul>
+          <li>LDR → A0</li>
+          <li>LED → Pin 13</li>
+        </ul>
+
+<pre><code>
+int ldr = A0;
+int led = 13;
+
+void setup() {
+
+  pinMode(led, OUTPUT);
+
+}
+
+void loop() {
+
+  int value = analogRead(ldr);
+
+  if(value < 500) {
+    digitalWrite(led, HIGH);
+  }
+  else {
+    digitalWrite(led, LOW);
+  }
+
+}
+</code></pre>
+
+      </div>
+
+      <div class="box">
+
+        <h3>Raspberry Pi</h3>
+
+        <ul>
+          <li>LDR → MCP3008 CH0</li>
+          <li>LED → GPIO17</li>
+        </ul>
+
+<pre><code>
+pip3 install gpiozero spidev
+</code></pre>
+
+<pre><code>
+from gpiozero import MCP3008, LED
+from time import sleep
+
+ldr = MCP3008(channel=0)
+led = LED(17)
+
+while True:
+
+    value = ldr.value
+
+    if value < 0.5:
+        led.on()
+    else:
+        led.off()
+
+    sleep(0.1)
+</code></pre>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Experiment 4 -->
+  <div class="section">
+
+    <h2>4. DHT22 Temperature & Humidity</h2>
+
+    <div class="grid">
+
+      <div class="box">
+
+        <h3>Arduino UNO</h3>
+
+        <ul>
+          <li>DHT22 DATA → Pin 2</li>
+          <li>VCC → 5V</li>
+          <li>GND → GND</li>
+        </ul>
+
+<pre><code>
+#include <DHT.h>
+
+#define DHTPIN 2
+#define DHTTYPE DHT22
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+
+  Serial.begin(9600);
+  dht.begin();
+
+}
+
+void loop() {
+
+  float temp =
+  dht.readTemperature();
+
+  float hum =
+  dht.readHumidity();
+
+  Serial.println(temp);
+  Serial.println(hum);
+
+  delay(2000);
+
+}
+</code></pre>
+
+      </div>
+
+      <div class="box">
+
+        <h3>Raspberry Pi</h3>
+
+        <ul>
+          <li>DHT22 DATA → GPIO4</li>
+          <li>VCC → 3.3V</li>
+          <li>GND → GND</li>
+        </ul>
+
+<pre><code>
+pip3 install Adafruit_DHT
+</code></pre>
+
+<pre><code>
+import Adafruit_DHT
+import time
+
+sensor = Adafruit_DHT.DHT22
+pin = 4
+
+while True:
+
+    humidity, temperature =
+    Adafruit_DHT.read_retry(
+    sensor, pin)
+
+    print(temperature)
+    print(humidity)
+
+    time.sleep(2)
+</code></pre>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
