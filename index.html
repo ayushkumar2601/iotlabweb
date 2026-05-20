@@ -578,5 +578,128 @@ python3 client.py
 
 </div>
 
+<!-- Experiment 6 -->
+<div class="section">
+
+  <h2>6. DHT11 Data Upload to ThingSpeak</h2>
+
+  <div class="grid">
+
+    <div class="box">
+
+      <h3>Project Description</h3>
+
+      <ul>
+        <li>Reads temperature & humidity using DHT11</li>
+        <li>Sends sensor data to ThingSpeak Cloud</li>
+        <li>Uses Raspberry Pi + Python</li>
+        <li>Uploads data every 15 seconds</li>
+      </ul>
+
+      <h3 style="margin-top:20px;">
+        Pin Connections
+      </h3>
+
+      <ul>
+        <li>DHT11 DATA → GPIO4</li>
+        <li>VCC → 3.3V</li>
+        <li>GND → GND</li>
+      </ul>
+
+    </div>
+
+    <div class="box">
+
+      <h3>Install Dependencies</h3>
+
+<pre><code>
+sudo apt update
+
+sudo apt install python3-pip
+
+pip3 install Adafruit_DHT
+
+pip3 install requests
+</code></pre>
+
+      <h3 style="margin-top:20px;">
+        Python Code
+      </h3>
+
+<pre><code>
+import Adafruit_DHT
+import requests
+import time
+
+API_KEY = 'YOUR_API_KEY'
+
+BASE_URL =
+'https://api.thingspeak.com/update'
+
+sensor = Adafruit_DHT.DHT11
+
+pin = 4
+
+while True:
+
+    humidity, temperature =
+    Adafruit_DHT.read(sensor, pin)
+
+    if humidity is not None and \
+       temperature is not None:
+
+        payload = {
+
+            'api_key': API_KEY,
+            'field1': temperature,
+            'field2': humidity
+
+        }
+
+        response = requests.get(
+        BASE_URL,
+        params=payload
+        )
+
+        print("Data Sent")
+        print(response.text)
+
+    time.sleep(15)
+</code></pre>
+
+    </div>
+
+  </div>
+
+  <div class="grid" style="margin-top:20px;">
+
+    <div class="box">
+
+      <h3>Run Code</h3>
+
+<pre><code>
+python3 thingspeak.py
+</code></pre>
+
+    </div>
+
+    <div class="box">
+
+      <h3>ThingSpeak Setup</h3>
+
+      <ul>
+        <li>Create ThingSpeak account</li>
+        <li>Create new channel</li>
+        <li>Enable Field1 & Field2</li>
+        <li>Copy Write API Key</li>
+        <li>Replace YOUR_API_KEY</li>
+      </ul>
+
+    </div>
+
+  </div>
+
+</div>
+
 </body>
 </html>
